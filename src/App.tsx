@@ -1,65 +1,55 @@
-import { useCallback, useState } from "react";
-import type { TabId } from "./components/BottomNav";
-import { BottomNav } from "./components/BottomNav";
-import type { CategoryId } from "./components/CategoryGrid";
-import type { Job } from "./data/jobs";
-import { FavoritesPage } from "./pages/FavoritesPage";
-import { HomePage } from "./pages/HomePage";
-import { ProfilePage } from "./pages/ProfilePage";
+import  { useEffect, useState } from 'react';
+import { db } from './firebase'; // 본인의 firebase 설정 파일 경로에 맞게 확인해주세요
+import { collection, getDocs } from 'firebase/firestore';
+import './App.css';
+
+interface Job {
+  id: string;
+  [key: string]: any; // 어떤 필드든 유연하게 받기 위함
+}
 
 function App() {
-  const [tab, setTab] = useState<TabId>("home");
-  const [query, setQuery] = useState("");
-  const [category, setCategory] = useState<CategoryId | null>(null);
   const [jobs, setJobs] = useState<Job[]>([]);
-  const [savedIds, setSavedIds] = useState<string[]>([]);
-  const [toast, setToast] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  const handleJobsLoaded = useCallback((nextJobs: Job[]) => {
-    setJobs(nextJobs);
+  useEffect(() => {
+    async function fetchJobs() {
+      try {
+        const querySnapshot = await getDocs(collection(db, "jobs"));
+        const jobList = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setJobs(jobList);
+      } catch (error) {
+        console.error("데이터를 불러오는 중 에러 발생:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchJobs();
   }, []);
 
-  const toggleSave = (id: string) => {
-    setSavedIds((current) =>
-      current.includes(id) ? current.filter((item) => item !== id) : [...current, id],
-    );
-  };
-
-  const showToast = (message: string) => {
-    setToast(message);
-    window.setTimeout(() => setToast(null), 1800);
-  };
+  if (loading) {
+    return <div className="loading">⏳ 일자리 정보를 불러오는 중입니다...</div>;
+  }
 
   return (
-    <div className="relative mx-auto min-h-svh max-w-[430px] bg-canvas text-ink">
-      <main className="pb-[calc(72px+env(safe-area-inset-bottom))]">
-        {tab === "home" && (
-          <HomePage
-            query={query}
-            onQueryChange={setQuery}
-            category={category}
-            onCategoryChange={(id) =>
-              setCategory((current) => (current === id ? null : id))
-            }
-            savedIds={savedIds}
-            onToggleSave={toggleSave}
-            onJobsLoaded={handleJobsLoaded}
-            onNotify={() => showToast("새 공고 알림이 3건 있어요")}
-          />
-        )}
-        {tab === "saved" && (
-          <FavoritesPage jobs={jobs} savedIds={savedIds} onToggleSave={toggleSave} />
-        )}
-        {tab === "profile" && <ProfilePage />}
-      </main>
-
-      <BottomNav tab={tab} onChange={setTab} />
-
-      {toast && (
-        <div className="pointer-events-none fixed bottom-24 left-1/2 z-30 w-[calc(100%-40px)] max-w-[390px] -translate-x-1/2 rounded-xl bg-ink px-4 py-3 text-center text-[14px] font-medium text-white">
-          {toast}
-        </div>
-      )}
+    <div className="container">
+      <h1>경기도 일자리 공고 목록</h1>
+      <p className="count">총 {jobs.length}개의 공고가 등록되어 있습니다.</p>
+      
+      <div className="job-list">
+        {jobs.map((job) => (
+          <div key={job.id} className="job-card">
+            {/* API 필드명에 따라 화면에 맞게 출력 */}
+            <h3>{job.PBANC_NM || job.JOB_NM || job.TITLE || "공고 제목 없음"}</h3>
+            <p><strong>기관/기업명:</strong> {job.ENTRPRS_NM || job.WKPLC_NM || job.INST_NM || "정보 없음"}</p>
+            <p><strong>접수마감일:</strong> {job.RCEPT_CLOS_DE || "상시 채용"}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

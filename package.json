@@ -11,8 +11,11 @@
   },
   "dependencies": {
     "express": "^4.19.2",
+    "firebase": "^12.17.1",
+    "node-fetch": "^3.3.2",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "xml2js": "^0.6.2"
   },
   "devDependencies": {
     "@apps-in-toss/devtools": "latest",
