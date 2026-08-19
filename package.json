@@ -14,7 +14,6 @@
   },
   "devDependencies": {
     "@apps-in-toss/devtools": "latest",
-    "@rolldown/plugin-babel": "^0.1.0",
     "@tailwindcss/vite": "latest",
     "@types/node": "^26.2.0",
     "@types/react": "^18.2.66",
