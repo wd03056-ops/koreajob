@@ -13,6 +13,9 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@apps-in-toss/devtools": "latest",
+    "@rolldown/plugin-babel": "^0.1.0",
+    "@tailwindcss/vite": "latest",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "@vitejs/plugin-react": "^4.2.1",
