@@ -15,7 +15,7 @@ export type JobabaQuery = {
   size?: number;
 };
 
-const JOBABA_API_URL = "https://adst.gg.go.kr/jobabaApi/v1.do";
+const JOBABA_API_URL = "/api/jobs";
 
 const TITLE_KEYS = [
   "title",
