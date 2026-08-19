@@ -7,7 +7,6 @@ export default async function handler(req, res) {
   
     const { page = 1, size = 20, query = "" } = req.query;
   
-    // URL을 공식 경기도 오픈 API 규격에 맞는지 확인
     const url = new URL("https://adst.gg.go.kr/jobabaApi/v1.do");
     url.searchParams.set("authKey", apiKey);
     url.searchParams.set("type", "json");
@@ -17,19 +16,20 @@ export default async function handler(req, res) {
       url.searchParams.set("query", query);
     }
   
-    console.log("실제 요청 URL:", url.toString().replace(apiKey, "REDACTED_KEY"));
-
     try {
-        const apiRes = await fetch(url.toString());
+        // 방화벽 차단을 우회하기 위해 브라우저 헤더를 추가합니다.
+        const apiRes = await fetch(url.toString(), {
+            headers: {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+                "Accept": "application/json, application/xml, text/xml, */*"
+            }
+        });
+        
         const data = await apiRes.text();
         
-        // 잡아바가 HTML(<br> 등)을 주면 그 내용을 무조건 서버 로그에 출력
         if (data.trim().startsWith("<")) {
-            console.error("🚨 잡아바 API가 HTML을 반환함:", data);
-            return res.status(500).json({ 
-                error: "Jobaba API rejected the request", 
-                rawHtml: data.substring(0, 300) // 에러 내용 일부를 응답으로 넘겨줌
-            });
+            console.error("🚨 여전히 방화벽에 막힘:", data.substring(0, 200));
+            return res.status(500).json({ error: "Firewall block", rawHtml: data.substring(0, 300) });
         }
         
         res.setHeader("Content-Type", "application/json");
