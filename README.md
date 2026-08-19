@@ -45,3 +45,4 @@ npm run deploy
 
 플랫폼 설정은 `apps-in-toss.config.ts`에서 관리해요.
 "# koreajob" 
+"# koreajob1" 
