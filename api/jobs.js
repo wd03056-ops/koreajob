@@ -17,13 +17,17 @@ export default async function handler(req, res) {
     }
   
     try {
-      const apiRes = await fetch(url.toString());
-      const data = await apiRes.text();
-      
-      // 브라우저가 이해할 수 있도록 그대로 전달
-      res.setHeader("Content-Type", "application/json");
-      return res.status(200).send(data);
+        const apiRes = await fetch(url.toString());
+        const data = await apiRes.text();
+        
+        // 만약 잡아바가 에러 페이지(HTML)를 주면 서버 로그에 찍어라!
+        if (data.trim().startsWith("<")) {
+          console.error("잡아바 API 에러 HTML 응답:", data);
+        }
+        
+        res.setHeader("Content-Type", "application/json");
+        return res.status(200).send(data);
     } catch (error) {
-      return res.status(500).json({ error: error.message });
+        return res.status(500).json({ error: error.message });
     }
-  }
+} // <-- 이 부분이 함수를 닫아주는 최종 중괄호입니다!
