@@ -1,8 +1,7 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
-import react, { reactCompilerPreset } from "@vitejs/plugin-react";
-import babel from "@rolldown/plugin-babel";
+import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import aitDevtools from "@apps-in-toss/devtools/unplugin";
 import { jobabaApiPlugin } from "./plugins/jobaba-api.ts";
@@ -25,8 +24,6 @@ export default defineConfig(() => {
       aitDevtools.vite(),
       tailwindcss(),
       react(),
-      babel({ presets: [reactCompilerPreset()] }),
     ],
   };
 });
-
