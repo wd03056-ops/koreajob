@@ -4,5 +4,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build"
+  },
+  "dependencies": {
+    "vite": "^5.0.0"
   }
 }
